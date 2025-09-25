@@ -33,4 +33,15 @@ app.use((err, req, res, next) => {
   res.status(status).json({ status: 'error', error: { message, code: status } });
 });
 
+app.use((req, res) => {
+  // Pass along an error object to the error-handling middleware
+  res.status(404).json({
+    status: 'error',
+    error: {
+      message: 'not found',
+      code: 404,
+    },
+  });
+});
+
 module.exports = app;
