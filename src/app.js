@@ -20,8 +20,10 @@ app.use(passport.initialize());
 
 app.use('/', require('./routes')); // includes /v1 with auth
 
+const { createErrorResponse } = require('./response');
+
 app.use((req, res) => {
-  res.status(404).json({ status: 'error', error: { message: 'not found', code: 404 } });
+  res.status(404).json(createErrorResponse(404, 'not found'));
 });
 
 // error handler
@@ -30,7 +32,7 @@ app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || 'unable to process request';
   if (status > 499) logger.error({ err }, 'Error processing request');
-  res.status(status).json({ status: 'error', error: { message, code: status } });
+  res.status(status).json(createErrorResponse(status, message));
 });
 
 app.use((req, res) => {
