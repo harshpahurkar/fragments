@@ -4,8 +4,10 @@
  * Get a list of fragments for the current user
  */
 const { createSuccessResponse } = require('../../response');
+const { listFragments } = require('../../model/fragments');
 
 module.exports = (req, res) => {
-  // TODO: this is just a placeholder to get something working
-  res.status(200).json(createSuccessResponse({ fragments: [] }));
+  const owner = (req.user && (req.user.username || req.user.email)) || 'anonymous';
+  const fragments = listFragments(owner);
+  res.status(200).json(createSuccessResponse({ fragments }));
 };
