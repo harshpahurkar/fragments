@@ -2,10 +2,13 @@
 const { createSuccessResponse, createErrorResponse } = require('../../response');
 const { getFragment } = require('../../model/fragments');
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   const { id } = req.params;
-  const owner = (req.user && (req.user.username || req.user.email)) || 'anonymous';
-  const fragment = getFragment(owner, id);
+  const owner =
+    req.ownerId ||
+    (req.user && (typeof req.user === 'string' ? req.user : req.user.username || req.user.email)) ||
+    'anonymous';
+  const fragment = await getFragment(owner, id);
   if (!fragment) return res.status(404).json(createErrorResponse(404, 'not found'));
 
   // If the client wants the raw content (e.g., text/plain), return it directly

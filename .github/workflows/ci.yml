@@ -1,18 +1,10 @@
-# .github/workflows/ci.yml
-
-# Continuous Integration (CI) Workflow
 name: ci
 
-# This workflow will run whenever we push commits to the `main` branch, or
-# whenever there's a pull request to the `main` branch. See:
-# [URL documentation]
 on:
-  pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   lint:
@@ -28,7 +20,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - name: Install node dependencies
+      - name: Install dependencies
         run: npm ci
 
       - name: Run ESLint
@@ -47,14 +39,14 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - name: Install node dependencies and run Tests
-        # There are two ways we could do this:
-        #
-        # 1. Call `npm ci` followed by `npm test` like so (NOTE: the use of | and -):
-        # run: |
-        # - npm install
-        # - npm test
-        #
-        # 2. Use `install-ci-test` to do it in a single command, see http://localhost:8080
-        # run: npm install-ci-test
-        run: npm install-ci-test
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage

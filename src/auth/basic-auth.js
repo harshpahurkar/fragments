@@ -6,6 +6,7 @@
 const auth = require('http-auth');
 const passport = require('passport');
 const authPassport = require('http-auth-passport');
+const { authorize } = require('./auth-middleware');
 
 // You'll need to add logger if it's not already imported
 const logger = require('../logger');
@@ -30,4 +31,4 @@ passport.use('http', basicAuthStrategy);
 
 module.exports.strategy = () => basicAuthStrategy;
 
-module.exports.authenticate = () => passport.authenticate('http', { session: false });
+module.exports.authenticate = () => authorize('http')();

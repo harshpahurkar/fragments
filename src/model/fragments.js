@@ -1,31 +1,28 @@
 // src/model/fragments.js
-// Simple in-memory fragment store for testing and development
-const { randomUUID } = require('crypto');
+// Adapter that uses the pluggable data strategy API
+const data = require('./data');
+const Fragment = require('./fragment');
 
-const store = new Map(); // Map<owner, Map<id, fragment>>
-
-function createFragment(owner, { content, contentType = 'text/plain' }) {
-  const id = randomUUID();
-  const fragment = { id, owner, content, contentType, created: new Date().toISOString() };
-  if (!store.has(owner)) store.set(owner, new Map());
-  store.get(owner).set(id, fragment);
-  return fragment;
+async function createFragment(owner, { content, contentType = 'text/plain' }) {
+  const frag = new Fragment({ owner, contentType, size: Buffer.byteLength(content || '') });
+  await data.writeFragment(owner, frag);
+  await data.writeFragmentData(owner, frag.id, content);
+  return Object.assign({}, frag, { content });
 }
 
-function listFragments(owner) {
-  const userMap = store.get(owner);
-  if (!userMap) return [];
-  return Array.from(userMap.keys());
+async function listFragments(owner) {
+  return data.listFragments(owner);
 }
 
-function getFragment(owner, id) {
-  const userMap = store.get(owner);
-  if (!userMap) return null;
-  return userMap.get(id) || null;
+async function getFragment(owner, id) {
+  const meta = await data.readFragment(owner, id);
+  if (!meta) return null;
+  const dataBuf = await data.readFragmentData(owner, id);
+  return Object.assign({}, meta, { content: dataBuf });
 }
 
-function clearAll() {
-  store.clear();
+async function clearAll() {
+  return data.clearAll();
 }
 
 module.exports = { createFragment, listFragments, getFragment, clearAll };

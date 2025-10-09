@@ -12,4 +12,12 @@ module.exports = {
   verbose: true,
   testTimeout: 5000,
   // Note: keep log guidance quiet during tests; use LOG_LEVEL in env.jest to control output
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
 };

@@ -5,11 +5,12 @@ const router = express.Router();
 // version and author from package.json
 const { version, author } = require('../../package.json');
 
-// Auth middleware
+// Auth middleware and owner hashing
 const { authenticate } = require('../auth');
+const { hashUser } = require('../auth/hash-user');
 
-// Protect all /v1/* routes
-router.use('/v1', authenticate(), require('./api'));
+// Protect all /v1/* routes and compute a hashed owner id on req.ownerId
+router.use('/v1', authenticate(), hashUser, require('./api'));
 
 // Response helpers
 const { createSuccessResponse } = require('../response');

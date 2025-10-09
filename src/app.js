@@ -14,8 +14,6 @@ app.use(helmet());
 app.use(cors());
 app.use(compression());
 app.use(express.json());
-// Support plain text bodies for fragment creation
-app.use(express.text({ type: 'text/*' }));
 
 passport.use(authenticate.strategy());
 app.use(passport.initialize());
