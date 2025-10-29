@@ -8,10 +8,15 @@ Usage (PowerShell):
 #>
 
 param(
-    [string]$ImageName = "fragments:latest",
+    [string]$DockerHubUser = "harshpahurkar",
+    [string]$ImageRepo = "fragments",
+    [string]$ImageTag = "latest",
     [int]$HostPort = 5555,
     [int]$ContainerPort = 8080
 )
+
+# Compose full image name from Docker Hub user/repo:tag
+$ImageName = "${DockerHubUser}/${ImageRepo}:${ImageTag}"
 
 Write-Host "Building image: $ImageName" -ForegroundColor Cyan
 docker build -t $ImageName .

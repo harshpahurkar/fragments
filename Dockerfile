@@ -1,41 +1,45 @@
-#This is a Dockerfile
+# Multi-stage Dockerfile - build stage + smaller runtime image
 
-# Use node version 22.12.0
-FROM node:22.12.0
+# ---- Build stage --------------------------------------------------------
+FROM node:22.12.0 AS build
 
 LABEL maintainer="Harsh Pahurkar <hpahurkar@myseneca.ca>"
-LABEL description="Fragments node.js microservice"
-
-# We default to use port 8080 in our service
-ENV PORT=8080
- 
-# Reduce npm spam when installing within Docker
-# [URL documentation]
-ENV NPM_CONFIG_LOGLEVEL=warn
- 
-# Disable colour when run inside Docker
-# [URL documentation]
-ENV NPM_CONFIG_COLOR=false
+LABEL description="Fragments node.js microservice (build stage)"
 
 # Use /app as our working directory
 WORKDIR /app
 
-# Option 1: explicit path - Copy the package.json and package-lock.json
-# files into /app. NOTE: the trailing `/` on `/app/`, which tells Docker
-# that `app` is a directory and not a file.
+# Copy package manifests and install production dependencies only
 COPY package.json package-lock.json ./
 
-# Install node dependencies defined in package-lock.json
-RUN npm install
+# Use npm ci for reproducible installs. Install production deps only to keep
+# the runtime image small. This assumes tests/dev tooling isn't required at
+# runtime.
+RUN npm ci --only=production
 
-# Copy src to /app/src/
+# Copy source
 COPY ./src ./src
 
-# Copy our HTPASSWD file
+# Copy our HTPASSWD file (used by tests / basic auth)
 COPY ./tests/.htpasswd ./tests/.htpasswd
 
-# Start the container by running our server
-CMD npm start
 
-# We run our service on port 8080
+# ---- Runtime stage ------------------------------------------------------
+# Use a smaller base image for runtime
+FROM node:22.12.0-alpine AS runtime
+
+LABEL description="Fragments node.js microservice (runtime)"
+
+# Default port for the service
+ENV PORT=8080
+ENV NPM_CONFIG_LOGLEVEL=warn
+ENV NPM_CONFIG_COLOR=false
+
+WORKDIR /app
+
+# Copy only the production node_modules and app source from the build stage
+COPY --from=build /app /app
+
+# Expose port and run
 EXPOSE 8080
+CMD ["node", "src/index.js"]

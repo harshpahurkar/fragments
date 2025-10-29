@@ -9,11 +9,21 @@ const authenticate = require('./auth');
 
 const app = express();
 
+// Attach pino HTTP logger
 app.use(pinoHttp);
 app.use(helmet());
 app.use(cors());
 app.use(compression());
 app.use(express.json());
+
+// Attach an X-App-Version header (helps with debugging/verification)
+// This uses the version from package.json so the running container can be
+// identified by its image version.
+const { version: appVersion } = require('../package.json');
+app.use((req, res, next) => {
+  res.setHeader('X-App-Version', appVersion);
+  next();
+});
 
 passport.use(authenticate.strategy());
 app.use(passport.initialize());
