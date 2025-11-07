@@ -1,6 +1,6 @@
 {
   "name": "fragments",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "description": "",
   "scripts": {
     "test:watch": "jest -c jest.config.js --runInBand --watch --",
@@ -31,7 +31,6 @@
     "prettier": "3.6.2",
     "supertest": "^7.1.4"
   },
-  
   "dependencies": {
     "aws-jwt-verify": "^5.1.0",
     "compression": "^1.8.1",
