@@ -10,8 +10,21 @@ async function createFragment(owner, { content, contentType = 'text/plain' }) {
   return Object.assign({}, frag, { content });
 }
 
-async function listFragments(owner) {
-  return data.listFragments(owner);
+async function listFragments(owner, expand = false) {
+  const ids = await data.listFragments(owner);
+  if (!expand) return ids;
+  // expand to metadata objects
+  const metas = await Promise.all(
+    ids.map(async (id) => {
+      const m = await data.readFragment(owner, id);
+      return m;
+    })
+  );
+  return metas;
+}
+
+async function getFragmentMeta(owner, id) {
+  return data.readFragment(owner, id);
 }
 
 async function getFragment(owner, id) {
@@ -25,4 +38,4 @@ async function clearAll() {
   return data.clearAll();
 }
 
-module.exports = { createFragment, listFragments, getFragment, clearAll };
+module.exports = { createFragment, listFragments, getFragment, getFragmentMeta, clearAll };

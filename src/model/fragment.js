@@ -23,5 +23,10 @@ module.exports = Fragment;
 Fragment.isSupportedType = function (type) {
   if (!type) return false;
   // accept any text/* types for now
-  return type === 'text/plain' || type.startsWith('text/');
+  return (
+    type === 'text/plain' ||
+    type.startsWith('text/') ||
+    // also accept JSON payloads
+    type === 'application/json'
+  );
 };

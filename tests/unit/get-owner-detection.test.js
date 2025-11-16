@@ -13,7 +13,7 @@ describe('GET owner detection', () => {
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
     await getHandler(req, res);
-    expect(mockList).toHaveBeenCalledWith('owner-hash');
+    expect(mockList).toHaveBeenCalledWith('owner-hash', undefined);
   });
 
   test('falls back to req.user string when ownerId absent', async () => {
@@ -25,6 +25,6 @@ describe('GET owner detection', () => {
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
     await getHandler(req, res);
-    expect(mockList).toHaveBeenCalledWith('user@example.com');
+    expect(mockList).toHaveBeenCalledWith('user@example.com', undefined);
   });
 });

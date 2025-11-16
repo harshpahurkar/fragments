@@ -12,8 +12,25 @@ module.exports = async (req, res) => {
   if (!fragment) return res.status(404).json(createErrorResponse(404, 'not found'));
 
   // If the client wants the raw content (e.g., text/plain), return it directly
-  if (fragment.contentType === 'text/plain') {
-    res.setHeader('Content-Type', 'text/plain');
+  // If the fragment is JSON, return parsed JSON with proper header
+  if (fragment.contentType === 'application/json') {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const obj =
+        typeof fragment.content === 'string' ? JSON.parse(fragment.content) : fragment.content;
+      return res.status(200).json(obj);
+    } catch (err) {
+      // fall back to raw string if parse fails
+      const logger = require('../../logger');
+      logger.warn({ err }, 'failed to parse stored JSON, returning raw content');
+      // return raw content as text to avoid advertising application/json when it is invalid
+      res.setHeader('Content-Type', 'text/plain');
+      return res.status(200).send(fragment.content);
+    }
+  }
+
+  if (fragment.contentType === 'text/plain' || fragment.contentType.startsWith('text/')) {
+    res.setHeader('Content-Type', fragment.contentType);
     return res.status(200).send(fragment.content);
   }
 

@@ -22,13 +22,21 @@ describe('POST /v1/fragments Location header and 415', () => {
   });
 
   test('returns 415 for unsupported media type', async () => {
+    // application/json is now supported and should be accepted
+    const payload = { hello: 'world' };
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set('Content-Type', 'application/json')
-      .send(JSON.stringify({ hello: 'world' }));
+      .send(JSON.stringify(payload));
 
-    expect(res.statusCode).toBe(415);
-    expect(res.body.status).toBe('error');
+    expect(res.statusCode).toBe(201);
+    expect(res.body.status).toBe('ok');
+    // returned fragment should not expose raw content; verify stored via GET
+    const id = res.body.fragment.id;
+    const got = await request(app).get(`/v1/fragments/${id}`).auth('user1@email.com', 'password1');
+    expect(got.statusCode).toBe(200);
+    expect(got.type).toBe('application/json');
+    expect(got.body).toEqual(payload);
   });
 });

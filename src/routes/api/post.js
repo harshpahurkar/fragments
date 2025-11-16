@@ -6,10 +6,10 @@ const logger = require('../../logger');
 
 module.exports = async (req, res) => {
   try {
-    // Only support text/plain for now
+    // Support text/* and application/json
     const type = req.headers['content-type'] || 'text/plain';
     const mime = contentType.parse(type).type;
-    if (mime !== 'text/plain') {
+    if (!(mime === 'application/json' || mime === 'text/plain' || mime.startsWith('text/'))) {
       return res.status(415).json(createErrorResponse(415, 'unsupported media type'));
     }
 
@@ -20,7 +20,36 @@ module.exports = async (req, res) => {
       'anonymous';
 
     // If req.body is a Buffer (raw parser), convert to string for text/* types
-    const content = Buffer.isBuffer(req.body) ? req.body.toString() : req.body;
+    // For JSON, store as a stringified JSON so metadata size calculations remain correct
+    let content;
+    if (Buffer.isBuffer(req.body)) {
+      content = req.body.toString();
+      if (mime === 'application/json') {
+        // ensure valid JSON string (normalized)
+        try {
+          const obj = JSON.parse(content);
+          content = JSON.stringify(obj);
+        } catch (err) {
+          logger.error({ err }, 'invalid json payload');
+          return res.status(400).json(createErrorResponse(400, 'invalid json'));
+        }
+      }
+    } else {
+      if (mime === 'application/json') {
+        // req.body may already be an object (if parsed). Normalize to string
+        try {
+          content =
+            typeof req.body === 'string'
+              ? JSON.stringify(JSON.parse(req.body))
+              : JSON.stringify(req.body);
+        } catch (err) {
+          logger.error({ err }, 'invalid json payload');
+          return res.status(400).json(createErrorResponse(400, 'invalid json'));
+        }
+      } else {
+        content = req.body;
+      }
+    }
     const fragment = await createFragment(owner, { content, contentType: mime });
 
     // Build Location header

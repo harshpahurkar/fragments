@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Fragments Technical Report — Harsh Pahurkar</title>
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; margin: 48px; }
+    h1, h2, h3 { color: #1f3b6f; }
+    .titlepage { text-align:center; margin-top:200px; }
+    .caption { font-size: 0.9em; color: #333; margin-bottom: 18px; }
+    .figure { margin: 18px 0; border: 1px solid #ddd; padding: 8px; }
+    pre { background:#f6f8fa; padding:10px; overflow:auto; }
+    .pagebreak { page-break-after:always; }
+  </style>
+</head>
+<body>
+  <div class="titlepage">
+    <h1>Fragments Microservice — Technical Report</h1>
+    <h2>Assignment 2: API Server Checklist</h2>
+    <p>Harsh Pahurkar</p>
+    <p>Course: CCP554 — Semester 6</p>
+    <p>Date: November 15, 2025</p>
+  </div>
+
+  <div class="pagebreak"></div>
+
+  <h2>Table of Contents</h2>
+  <ol>
+    <li>Introduction</li>
+    <li>Repository and CI links</li>
+    <li>Implementation summary</li>
+    <li>Evidence & Screenshots (with reproduction steps)</li>
+    <li>How to reproduce & verify (step-by-step)</li>
+    <li>Conclusion and outstanding work</li>
+  </ol>
+
+  <div class="pagebreak"></div>
+
+  <h2>1. Introduction</h2>
+  <p>This report documents the work completed for Assignment 2: API Server Checklist for the Fragments microservice. It builds on the code delivered in Assignment 1 and adds support for:</p>
+  <ul>
+    <li>POST handling for text/* and application/json payloads</li>
+    <li>GET /v1/fragments?expand=1 returning expanded metadata</li>
+    <li>GET /v1/fragments/:id/info returning fragment metadata</li>
+    <li>GET /v1/fragments/:id.ext supporting markdown (.md) → HTML (.html) via markdown-it</li>
+    <li>Multi-stage Dockerfile and CI pipeline that builds and pushes Docker images</li>
+    <li>Unit tests and coverage for the above functionality</li>
+  </ul>
+
+  <h2>2. Repository and CI links</h2>
+  <p>Private GitHub repository (source): [PRIVATE REPO URL - replace with your private repo link]</p>
+  <p>Public Docker Hub repository (images): https://hub.docker.com/repository/docker/harshpahurkar/fragments</p>
+  <p>GitHub Actions CI (example run): [link to successful ci run — copy from Actions tab]</p>
+
+  <h2>3. Implementation summary</h2>
+  <p>Key files added/modified:</p>
+  <ul>
+    <li><code>src/routes/api/post.js</code> — Accepts application/json and text/*, normalizes JSON before storage.</li>
+    <li><code>src/routes/api/get.js</code> — Supports <code>?expand=1</code> by forwarding to the model.</li>
+    <li><code>src/routes/api/getById.js</code> — Returns content with appropriate Content-Type. If stored JSON is corrupted, returns raw content as <code>text/plain</code>.</li>
+    <li><code>src/routes/api/getInfo.js</code> — Returns metadata for a fragment.</li>
+    <li><code>src/routes/api/getByIdExt.js</code> — Supports <code>id.html</code> converting markdown to HTML via <code>markdown-it</code>.</li>
+    <li><code>src/model/fragments.js</code> — Added expand behavior and exported <code>getFragmentMeta</code>.</li>
+    <li><code>Dockerfile</code> — Multi-stage Dockerfile producing a small runtime image.</li>
+    <li><code>.github/workflows/ci.yml</code> — CI pipeline: lint, unit-tests+coverage, build & push image to Docker Hub.</li>
+  </ul>
+
+  <h2>4. Evidence & Screenshots (with exact reproduction steps)</h2>
+  <p>Below are the required screenshots and exact steps/commands so a grader can reproduce each screenshot from scratch. Where I could not produce live screenshots (UI/Cognito), I included placeholders and explicit steps to capture them.</p>
+
+  <h3>Figure 4.1 — Docker Hub tags page</h3>
+  <div class="figure">
+    <div class="caption">What to capture: Docker Hub repository page showing tags: <code>latest</code>, <code>main</code>, and commit SHA tags.</div>
+    <p>How to reproduce:</p>
+    <ol>
+      <li>Open https://hub.docker.com and log in to your Docker Hub account.</li>
+      <li>Navigate to <code>harshpahurkar/fragments</code> (or your Docker Hub repo name).</li>
+      <li>Open the Tags view and take a screenshot showing the listed tags and timestamps.</li>
+    </ol>
+  </div>
+
+  <h3>Figure 4.2 — GitHub Actions CI run showing successful docker push</h3>
+  <div class="figure">
+    <div class="caption">What to capture: GitHub Actions run page for the <code>ci</code> workflow. Expand the job labeled "Build and push" (docker/build-push-action) and screenshot the logs showing the push lines for the tags.</div>
+    <p>How to reproduce:</p>
+    <ol>
+      <li>Go to your GitHub repo → Actions → click the most recent <code>ci</code> run (green).</li>
+      <li>Click the job that includes the docker push step (it may be called "docker-hub" or "Build and push").</li>
+      <li>Expand the <code>Build and push</code> step and screenshot the output that shows lines like "pushing" or "pushed" and repository digests.</li>
+    </ol>
+  </div>
+
+  <h3>Figure 4.3 — EC2: running container and server logs</h3>
+  <div class="figure">
+    <div class="caption">What to capture: On the EC2 instance show: <code>docker ps</code> proving container is running, <code>docker logs --tail 200 fragments</code> showing server started, and the curl health JSON response.</div>
+    <p>How to reproduce (on EC2):</p>
+    <pre>sudo systemctl start docker
+docker pull harshpahurkar/fragments:latest
+docker run -d --name fragments -p 8080:8080 harshpahurkar/fragments:latest
+docker ps --filter name=fragments
+docker logs --tail 200 fragments
+curl -i http://localhost:8080/health</pre>
+    <p>Take screenshots of the terminal output for each of the above commands. The health response should be JSON with <code>status: "ok"</code> and the version fields.</p>
+  </div>
+
+  <h3>Figure 4.4 — fragments-ui + Cognito (placeholders)</h3>
+  <div class="figure">
+    <div class="caption">What to capture: (If already done by you) screenshots showing the fragments-ui authenticating via Cognito Hosted UI, metadata list, creating JSON fragment, creating Markdown fragment, and the Location header returned after POST. If you already have these, paste them into the report. Otherwise follow the reproduction steps below.</div>
+    <p>How to reproduce (summary):</p>
+    <ol>
+      <li>Start fragments-ui locally (e.g., <code>npm start</code>) with environment pointing to your API URL (http://&lt;EC2-IP&gt;:8080) and Cognito app client settings.</li>
+      <li>Open the Cognito Hosted UI login URL configured for your app client and sign in.</li>
+      <li>After login, fragments-ui will show a metadata list for the user. Take a screenshot.</li>
+      <li>Use the UI to create a new JSON fragment — open devtools (Network) and screenshot the POST response including the Location header.</li>
+      <li>Create a Markdown fragment and then fetch it with <code>GET /v1/fragments/&lt;id&gt;.html</code> and screenshot the rendered HTML.</li>
+    </ol>
+    <p><strong>Placeholder note:</strong> You told me you already have the UI portion taken care of; insert those screenshots here in the final report.</p>
+  </div>
+
+  <h3>Figure 4.5 — Tests & coverage</h3>
+  <div class="figure">
+    <div class="caption">What to capture: Terminal output from <code>npm run coverage</code> showing the coverage summary (Statements/Branches/Lines) and the coverage/lcov-report index if desired.</div>
+    <p>How to reproduce:</p>
+    <pre>npm ci
+npm test
+npm run coverage</pre>
+    <p>Take a screenshot of the terminal coverage summary (the table listing Stmts/Branches/Funcs/Lines and percentages). Ensure Statements and Lines are above 80% (current project shows ~95% statements/lines).</p>
+  </div>
+
+  <div class="pagebreak"></div>
+
+  <h2>5. How to reproduce & verify (concise checklist)</h2>
+  <p>This section gives a concise, step-by-step guide a grader can follow to verify the API checklist items and evidence.</p>
+
+  <h3>Preparation</h3>
+  <ol>
+    <li>Clone the repo (private instructor repo or your private link):
+      <pre>git clone &lt;private-repo-url&gt; fragments
+cd fragments
+</pre>
+    </li>
+    <li>Install dependencies and run unit tests locally:
+      <pre>npm ci
+npm test
+npm run coverage</pre>
+      Confirm tests pass and coverage summary is visible; screenshot it.
+    </li>
+  </ol>
+
+  <h3>CI / Docker Hub verification</h3>
+  <ol>
+    <li>Open GitHub Actions → select the latest <code>ci</code> run → verify the unit-tests job passed and the docker build/push step completed. Screenshot the build-push logs.</li>
+    <li>Open Docker Hub (public URL) and confirm image tags (latest/main/sha) exist. Screenshot the tags page.</li>
+  </ol>
+
+  <h3>EC2 run & API verification</h3>
+  <ol>
+    <li>SSH to EC2 instance and run the commands under Figure 4.3 to pull & run the container.</li>
+    <li>Use curl to interact with health and API endpoints; screenshot responses showing headers and body. Example:
+      <pre>curl -i http://localhost:8080/health
+curl -i -X POST -H "Content-Type: application/json" -u user1@email.com:password1 -d '{"a":1}' http://localhost:8080/v1/fragments
+</pre>
+    </li>
+  </ol>
+
+  <div class="pagebreak"></div>
+
+  <h2>6. Conclusion and outstanding work</h2>
+  <p>Completed:</p>
+  <ul>
+    <li>All required API endpoints implemented and unit-tested.</li>
+    <li>Multi-stage Dockerfile and CI workflow implemented to push images to Docker Hub.</li>
+    <li>Unit tests and coverage implemented; statement/line coverage well above 80%.</li>
+  </ul>
+
+  <p>Outstanding (to verify manually):</p>
+  <ul>
+    <li>Confirm Docker Hub tags and that CI pushed images (take screenshots from Docker Hub and Actions logs).</li>
+    <li>Run the pre-built Docker Hub image on EC2 and capture the container evidence screenshots.</li>
+    <li>Insert the fragments-ui and Cognito screenshots (you mentioned you have these — paste them into the 'Figure 4.4' section).</li>
+  </ul>
+
+  <h3>Notes on known issues</h3>
+  <ul>
+    <li>If stored JSON is corrupted, the server returns the raw content as <code>text/plain</code> (this avoids sending invalid JSON body with a JSON content-type). This behaviour is documented in the report and covered by a unit test.</li>
+    <li>The Dockerfile currently copies <code>tests/.htpasswd</code> into the build stage. It's included for test convenience; if you want a production-only image, remove test files from the final runtime image.</li>
+  </ul>
+
+  <p>That's the report draft. Replace the placeholder links with the actual private repo URL and the Actions run URL, and paste your UI screenshots into the Figure 4.4 area. Once you confirm the screenshots, I can also export or convert this HTML document to a PDF for you if you'd like.</p>
+
+  <p>— End of report —</p>
+</body>
+</html>

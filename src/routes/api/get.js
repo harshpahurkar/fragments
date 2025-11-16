@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
     req.ownerId ||
     (req.user && (typeof req.user === 'string' ? req.user : req.user.username || req.user.email)) ||
     'anonymous';
-  const fragments = await listFragments(owner);
+  const expand = req.query && (req.query.expand === '1' || req.query.expand === 'true');
+  const fragments = await listFragments(owner, expand);
   res.status(200).json(createSuccessResponse({ fragments }));
 };

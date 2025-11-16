@@ -29,6 +29,10 @@ const router = express.Router();
 router.get('/fragments', require('./get'));
 // Create a fragment (supports text/plain)
 router.post('/fragments', rawBody(), require('./post'));
+// Get a fragment by id info (metadata)
+router.get('/fragments/:id/info', require('./getInfo'));
+// Get a fragment by id with extension support (e.g., .html converted from markdown)
+router.get('/fragments/:id.:ext', require('./getByIdExt'));
 // Get a fragment by id
 router.get('/fragments/:id', require('./getById'));
 // Other routes (POST, DELETE, etc.) will go here later on...
