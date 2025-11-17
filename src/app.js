@@ -12,7 +12,16 @@ const app = express();
 // Attach pino HTTP logger
 app.use(pinoHttp);
 app.use(helmet());
-app.use(cors());
+// Enable CORS and expose the Location header so browser clients can read it
+// (the server sets a Location header on POST /v1/fragments when creating a fragment)
+app.use(
+  cors({
+    // reflect request origin (allows browser to send requests from localhost during testing)
+    origin: true,
+    // expose Location so browser JavaScript can read it from the response
+    exposedHeaders: ['Location'],
+  })
+);
 app.use(compression());
 app.use(express.json());
 
