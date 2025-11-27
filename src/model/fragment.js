@@ -8,12 +8,14 @@ class Fragment {
     contentType = 'text/plain',
     size = 0,
     created = new Date().toISOString(),
+    updated = new Date().toISOString(),
   }) {
     this.id = id;
     this.owner = owner;
     this.contentType = contentType;
     this.size = size;
     this.created = created;
+    this.updated = updated;
   }
 }
 

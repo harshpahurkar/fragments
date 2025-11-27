@@ -19,7 +19,7 @@ describe('Fragments CRUD', () => {
     expect(res.statusCode).toBe(201);
     expect(res.body.status).toBe('ok');
     expect(res.body.fragment).toHaveProperty('id');
-    expect(res.body.fragment).toHaveProperty('owner');
+    expect(res.body.fragment).toHaveProperty('ownerId');
   });
 
   test('GET /v1/fragments returns list of fragment ids', async () => {

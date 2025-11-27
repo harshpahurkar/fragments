@@ -69,7 +69,7 @@ describe('Storage failure and Cognito bearer tests', () => {
 
     const { hashEmail } = require('../../src/hash');
     expect(post.statusCode).toBe(201);
-    expect(post.body.fragment.owner).toBe(hashEmail('bearer@example.com'));
+    expect(post.body.fragment.ownerId).toBe(hashEmail('bearer@example.com'));
 
     const list = await request(app).get('/v1/fragments').set('Authorization', 'Bearer faketoken');
     expect(list.statusCode).toBe(200);

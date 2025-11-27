@@ -61,7 +61,16 @@ module.exports = async (req, res) => {
     }
 
     logger.info({ owner, id: fragment.id }, 'fragment created');
-    res.status(201).json(createSuccessResponse({ fragment }));
+    // Map contentType to type for response
+    const response = {
+      id: fragment.id,
+      ownerId: fragment.owner,
+      created: fragment.created,
+      updated: fragment.updated,
+      type: fragment.contentType,
+      size: fragment.size,
+    };
+    res.status(201).json(createSuccessResponse({ fragment: response }));
   } catch (err) {
     logger.error({ err }, 'unable to create fragment');
     res.status(500).json(createErrorResponse(500, 'unable to process request'));
