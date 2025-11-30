@@ -38,4 +38,19 @@ async function clearAll() {
   return data.clearAll();
 }
 
-module.exports = { createFragment, listFragments, getFragment, getFragmentMeta, clearAll };
+async function deleteFragment(owner, id) {
+  // Check metadata exists first
+  const meta = await data.readFragment(owner, id);
+  if (!meta) return false;
+  await data.deleteFragment(owner, id);
+  return true;
+}
+
+module.exports = {
+  createFragment,
+  listFragments,
+  getFragment,
+  getFragmentMeta,
+  clearAll,
+  deleteFragment,
+};

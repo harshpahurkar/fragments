@@ -16,8 +16,16 @@ module.exports = async (req, res) => {
   if (fragment.contentType === 'application/json') {
     res.setHeader('Content-Type', 'application/json');
     try {
-      const obj =
-        typeof fragment.content === 'string' ? JSON.parse(fragment.content) : fragment.content;
+      // fragment.content may be a Buffer (from S3), a string, or already an object.
+      let obj;
+      if (Buffer.isBuffer(fragment.content)) {
+        // Convert Buffer -> string -> object
+        obj = JSON.parse(fragment.content.toString());
+      } else if (typeof fragment.content === 'string') {
+        obj = JSON.parse(fragment.content);
+      } else {
+        obj = fragment.content;
+      }
       return res.status(200).json(obj);
     } catch (err) {
       // fall back to raw string if parse fails

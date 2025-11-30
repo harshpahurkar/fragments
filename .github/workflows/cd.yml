@@ -45,6 +45,33 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+      # Render the task definition so we can update the image and environment
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: update-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPO: fragments
+          VERSION_TAG: ${{ github.ref_name }}
+        with:
+          task-definition: fragments-definition.json
+          container-name: fragments
+          # Use the image we just built and pushed to ECR for this tag
+          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:${{ env.VERSION_TAG }}
+          # IMPORTANT: do NOT include long-lived AWS credentials here; we will
+          # rely on the ECS Task Role (taskRoleArn) at runtime instead. Keep
+          # only non-secret configuration and secrets referenced via GitHub
+          # Encrypted Secrets below.
+          environment-variables: |
+            LOG_LEVEL=info
+            NODE_ENV=production
+            AWS_REGION=us-east-1
+            AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
+            AWS_S3_ENDPOINT_URL=${{ secrets.AWS_S3_ENDPOINT_URL }}
+            # Cognito / other config (if used) - keep these as secrets.
+            AWS_COGNITO_REGION=${{ secrets.AWS_COGNITO_REGION }}
+            AWS_COGNITO_USER_POOL_ID=${{ secrets.AWS_COGNITO_USER_POOL_ID }}
+            AWS_COGNITO_CLIENT_ID=${{ secrets.AWS_COGNITO_CLIENT_ID }}
       # Build and Push an Image to Amazon ECR
       - name: Build and push to Amazon ECR
         env:

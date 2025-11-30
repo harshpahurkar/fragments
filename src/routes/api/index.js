@@ -35,6 +35,8 @@ router.get('/fragments/:id/info', require('./getInfo'));
 router.get('/fragments/:id.:ext', require('./getByIdExt'));
 // Get a fragment by id
 router.get('/fragments/:id', require('./getById'));
+// Delete a fragment by id
+router.delete('/fragments/:id', require('./delete'));
 // Other routes (POST, DELETE, etc.) will go here later on...
 
 module.exports = router;

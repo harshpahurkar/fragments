@@ -58,11 +58,20 @@ function clearAll() {
   dataStore.clear();
 }
 
+async function deleteFragment(owner, id) {
+  const ownerMeta = metaStore.get(owner);
+  if (ownerMeta && ownerMeta.has(id)) ownerMeta.delete(id);
+  const ownerData = dataStore.get(owner);
+  if (ownerData && ownerData.has(id)) ownerData.delete(id);
+  logger.debug({ owner, id }, 'memory-db: deleted fragment');
+}
+
 module.exports = {
   writeFragment,
   writeFragmentData,
   readFragment,
   readFragmentData,
   listFragments,
+  deleteFragment,
   clearAll,
 };
