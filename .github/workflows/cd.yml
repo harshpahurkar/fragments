@@ -66,11 +66,7 @@ jobs:
             LOG_LEVEL=info
             NODE_ENV=production
             AWS_REGION=us-east-1
-            AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
-            AWS_S3_ENDPOINT_URL=${{ secrets.AWS_S3_ENDPOINT_URL }}
-            AWS_COGNITO_REGION=${{ secrets.AWS_COGNITO_REGION }}
-            AWS_COGNITO_USER_POOL_ID=${{ secrets.AWS_COGNITO_USER_POOL_ID }}
-            AWS_COGNITO_CLIENT_ID=${{ secrets.AWS_COGNITO_CLIENT_ID }}
+            AWS_S3_BUCKET_NAME=fragments
       # Build and Push an Image to Amazon ECR
       - name: Build and push to Amazon ECR
         env:
