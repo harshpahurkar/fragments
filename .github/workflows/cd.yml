@@ -68,7 +68,6 @@ jobs:
             AWS_REGION=us-east-1
             AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
             AWS_S3_ENDPOINT_URL=${{ secrets.AWS_S3_ENDPOINT_URL }}
-            # Cognito / other config (if used) - keep these as secrets.
             AWS_COGNITO_REGION=${{ secrets.AWS_COGNITO_REGION }}
             AWS_COGNITO_USER_POOL_ID=${{ secrets.AWS_COGNITO_USER_POOL_ID }}
             AWS_COGNITO_CLIENT_ID=${{ secrets.AWS_COGNITO_CLIENT_ID }}
