@@ -12,8 +12,9 @@ services:
     environment:
       # Our API will be running on http://localhost:8080
       - API_URL=http://localhost:8080
-      # Use Basic Auth (for running tests, CI)
-      - HTPASSWD_FILE=tests/.htpasswd
+      # Use AWS Cognito for authentication (for fragments-ui)
+      - AWS_COGNITO_POOL_ID=us-east-1_v3BeAm9MG
+      - AWS_COGNITO_CLIENT_ID=5plpvg7j9b80e248laddildddb
       # Use the LOG_LEVEL set in the host environment, or default to info
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - AWS_REGION=us-east-1
