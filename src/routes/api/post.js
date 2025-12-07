@@ -52,6 +52,8 @@ module.exports = async (req, res) => {
     }
     const fragment = await createFragment(owner, { content, contentType: mime });
 
+    logger.info({ owner, id: fragment.id, fragment }, 'fragment created - full object');
+
     // Build Location header
     const base =
       process.env.API_URL ||
@@ -64,12 +66,14 @@ module.exports = async (req, res) => {
     // Map contentType to type for response
     const response = {
       id: fragment.id,
-      ownerId: fragment.owner,
+      ownerId: fragment.owner || owner,
       created: fragment.created,
       updated: fragment.updated,
       type: fragment.contentType,
       size: fragment.size,
     };
+
+    logger.info({ response }, 'sending response');
     res.status(201).json(createSuccessResponse({ fragment: response }));
   } catch (err) {
     logger.error({ err }, 'unable to create fragment');

@@ -21,8 +21,10 @@
       "environment": [
         { "name": "LOG_LEVEL", "value": "info" },
         { "name": "NODE_ENV", "value": "production" },
-        { "name": "AWS_S3_BUCKET_NAME", "value": "fragments" },
-        { "name": "AWS_DYNAMODB_TABLE_NAME", "value": "fragments" }
+        { "name": "AWS_S3_BUCKET_NAME", "value": "hpahurkar-fragments" },
+        { "name": "AWS_DYNAMODB_TABLE_NAME", "value": "fragments" },
+        { "name": "AWS_COGNITO_POOL_ID", "value": "us-east-1_v3BeAm9MG" },
+        { "name": "AWS_COGNITO_CLIENT_ID", "value": "5plpvg7j9b80e248laddildddb" }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
