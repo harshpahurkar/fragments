@@ -44,15 +44,15 @@ describe('POST /v1/fragments - additional branch coverage', () => {
     expect(res.body.fragment.type).toBe('text/csv');
   });
 
-  test('returns 415 for unsupported content type image/png', async () => {
+  test('returns 201 for supported content type image/png', async () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
       .set('Content-Type', 'image/png')
       .send(Buffer.from('fake png data'));
 
-    expect(res.statusCode).toBe(415);
-    expect(res.body.error.message).toContain('unsupported media type');
+    expect(res.statusCode).toBe(201);
+    expect(res.body.fragment.type).toBe('image/png');
   });
 
   test('returns 415 for unsupported content type application/xml', async () => {

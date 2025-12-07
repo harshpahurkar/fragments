@@ -29,6 +29,8 @@ const router = express.Router();
 router.get('/fragments', require('./get'));
 // Create a fragment (supports text/plain)
 router.post('/fragments', rawBody(), require('./post'));
+// Update a fragment by id
+router.put('/fragments/:id', rawBody(), require('./put'));
 // Get a fragment by id info (metadata)
 router.get('/fragments/:id/info', require('./getInfo'));
 // Get a fragment by id with extension support (e.g., .html converted from markdown)

@@ -46,6 +46,30 @@ async function deleteFragment(owner, id) {
   return true;
 }
 
+async function updateFragment(owner, id, content) {
+  // Get existing fragment metadata
+  const existingMeta = await data.readFragment(owner, id);
+  if (!existingMeta) {
+    throw new Error('Fragment not found');
+  }
+
+  // Create updated fragment with new size and updated timestamp
+  const updatedFragment = new Fragment({
+    id: existingMeta.id,
+    owner: existingMeta.owner || owner,
+    contentType: existingMeta.contentType,
+    size: Buffer.byteLength(content || ''),
+    created: existingMeta.created,
+    updated: new Date().toISOString(),
+  });
+
+  // Write updated data and metadata
+  await data.writeFragmentData(owner, id, content);
+  await data.writeFragment(owner, updatedFragment);
+
+  return Object.assign({}, updatedFragment, { content });
+}
+
 module.exports = {
   createFragment,
   listFragments,
@@ -53,4 +77,5 @@ module.exports = {
   getFragmentMeta,
   clearAll,
   deleteFragment,
+  updateFragment,
 };

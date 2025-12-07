@@ -2,14 +2,15 @@
 const contentType = require('content-type');
 const { createSuccessResponse, createErrorResponse } = require('../../response');
 const { createFragment } = require('../../model/fragments');
+const Fragment = require('../../model/fragment');
 const logger = require('../../logger');
 
 module.exports = async (req, res) => {
   try {
-    // Support text/* and application/json
+    // Validate content-type using Fragment's supported types
     const type = req.headers['content-type'] || 'text/plain';
     const mime = contentType.parse(type).type;
-    if (!(mime === 'application/json' || mime === 'text/plain' || mime.startsWith('text/'))) {
+    if (!Fragment.isSupportedType(mime)) {
       return res.status(415).json(createErrorResponse(415, 'unsupported media type'));
     }
 
@@ -19,10 +20,15 @@ module.exports = async (req, res) => {
         (typeof req.user === 'string' ? req.user : req.user.username || req.user.email)) ||
       'anonymous';
 
-    // If req.body is a Buffer (raw parser), convert to string for text/* types
-    // For JSON, store as a stringified JSON so metadata size calculations remain correct
+    // Handle content based on type
     let content;
-    if (Buffer.isBuffer(req.body)) {
+
+    // For images, keep as Buffer
+    if (mime.startsWith('image/')) {
+      content = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body);
+    }
+    // For text and application types
+    else if (Buffer.isBuffer(req.body)) {
       content = req.body.toString();
       if (mime === 'application/json') {
         // ensure valid JSON string (normalized)

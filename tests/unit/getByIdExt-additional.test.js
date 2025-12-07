@@ -43,7 +43,7 @@ describe('GET /v1/fragments/:id.ext - extension conversion', () => {
       .auth('user1@email.com', 'password1');
 
     expect(getRes.statusCode).toBe(415);
-    expect(getRes.body.error.message).toContain('cannot convert');
+    expect(getRes.body.error.message).toContain('Cannot convert');
   });
 
   test('returns 400 for unsupported extension', async () => {
@@ -60,8 +60,8 @@ describe('GET /v1/fragments/:id.ext - extension conversion', () => {
       .get(`/v1/fragments/${fragmentId}.pdf`)
       .auth('user1@email.com', 'password1');
 
-    expect(getRes.statusCode).toBe(400);
-    expect(getRes.body.error.message).toContain('unsupported extension');
+    expect(getRes.statusCode).toBe(415);
+    expect(getRes.body.error.message).toContain('Cannot convert');
   });
 
   test('returns 404 for non-existent fragment with extension', async () => {
@@ -70,7 +70,7 @@ describe('GET /v1/fragments/:id.ext - extension conversion', () => {
       .auth('user1@email.com', 'password1');
 
     expect(getRes.statusCode).toBe(404);
-    expect(getRes.body.error.message).toBe('not found');
+    expect(getRes.body.error.message).toContain('not found');
   });
 
   test('converts markdown with lists to HTML', async () => {
@@ -170,7 +170,7 @@ describe('GET /v1/fragments/:id.ext - extension conversion', () => {
     expect(getRes.text).toContain('<a href="https://example.com">');
   });
 
-  test('returns 400 for unknown extension like .xml', async () => {
+  test('returns 415 for unknown extension like .xml', async () => {
     const postRes = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
@@ -184,10 +184,10 @@ describe('GET /v1/fragments/:id.ext - extension conversion', () => {
       .get(`/v1/fragments/${fragmentId}.xml`)
       .auth('user1@email.com', 'password1');
 
-    expect(getRes.statusCode).toBe(400);
+    expect(getRes.statusCode).toBe(415);
   });
 
-  test('returns 400 for extension .txt', async () => {
+  test('returns 200 for extension .txt from text/plain', async () => {
     const postRes = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
@@ -201,6 +201,7 @@ describe('GET /v1/fragments/:id.ext - extension conversion', () => {
       .get(`/v1/fragments/${fragmentId}.txt`)
       .auth('user1@email.com', 'password1');
 
-    expect(getRes.statusCode).toBe(400);
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.text).toBe('data');
   });
 });

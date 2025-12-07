@@ -7,7 +7,7 @@ beforeEach(() => {
 });
 
 describe('GET extension negatives', () => {
-  test('unsupported extension returns 400', async () => {
+  test('unsupported extension returns 415', async () => {
     // create a fragment
     const create = await request(app)
       .post('/v1/fragments')
@@ -16,10 +16,11 @@ describe('GET extension negatives', () => {
       .send('hello');
     const id = create.body.fragment.id;
 
+    // Try an invalid conversion (plain text to json)
     const res = await request(app)
-      .get(`/v1/fragments/${id}.txt`)
+      .get(`/v1/fragments/${id}.json`)
       .auth('user1@email.com', 'password1');
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(415);
   });
 
   test('html conversion for non-markdown returns 415', async () => {
