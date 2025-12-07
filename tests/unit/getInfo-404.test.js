@@ -47,7 +47,7 @@ describe('GET /v1/fragments/:id/info', () => {
     expect(getRes.body.fragment.size).toBeGreaterThan(0);
   });
 
-  test('returns 404 when requesting another user\'s fragment info', async () => {
+  test("returns 404 when requesting another user's fragment info", async () => {
     // User 1 creates a fragment
     const postRes = await request(app)
       .post('/v1/fragments')

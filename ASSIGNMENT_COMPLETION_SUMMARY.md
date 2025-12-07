@@ -1,14 +1,17 @@
 # Fragments CI/CD Assignment - Completion Summary
+
 ## Date: November 29, 2025
 
 ### ✅ COMPLETED TASKS
 
 #### 1. Hadolint Local & CI
+
 - **Local**: Ran `docker run --rm -i hadolint/hadolint < Dockerfile` → No warnings/errors (silent = success)
 - **CI**: `.github/workflows/ci.yml` includes `dockerfile-lint` job using `hadolint/hadolint-action@v3.1.0`
 - **Screenshot**: Hadolint produces no output when successful
 
 #### 2. Docker Hub CI Build & Push
+
 - **Status**: ✅ Successfully pushing images
 - **CI Job**: `docker-hub` in `.github/workflows/ci.yml`
 - **Tags Verified**:
@@ -19,17 +22,19 @@
 - **Screenshot Location**: Docker Hub tags page
 
 #### 3. Amazon ECR CD Workflow
+
 - **Status**: ✅ Successfully pushing to ECR
 - **Workflow**: `.github/workflows/cd.yml` triggered by git tags
 - **Tags in ECR**:
   - `v0.9.1` (latest release)
-  - `latest` 
+  - `latest`
   - `v0.7.0` (from Lab 7)
 - **Repository**: 992382527628.dkr.ecr.us-east-1.amazonaws.com/fragments
 - **Last Push**: November 29, 2025 at 22:19 EST
 - **Screenshot Command**: `aws ecr list-images --repository-name fragments --region us-east-1 --filter "tagStatus=TAGGED"`
 
 #### 4. ECS Task Definition
+
 - **File**: `fragments-definition.json`
 - **Task Role**: `arn:aws:iam::992382527628:role/LabRole`
 - **Execution Role**: `arn:aws:iam::992382527628:role/LabRole`
@@ -40,6 +45,7 @@
   - `AWS_S3_BUCKET_NAME=fragments`
 
 #### 5. GitHub Secrets Configured
+
 - ✅ `DOCKERHUB_USERNAME`
 - ✅ `DOCKERHUB_TOKEN`
 - ✅ `AWS_ACCESS_KEY_ID`
@@ -47,6 +53,7 @@
 - ✅ `AWS_SESSION_TOKEN`
 
 #### 6. Testing & Coverage
+
 - **Unit Tests**: 48/48 passing (27 test suites)
 - **Coverage**:
   - Statements: 87.84%
@@ -60,24 +67,24 @@
 ### ⚠️ REMAINING TASK (Manual Step Required)
 
 #### S3 IAM Policy for LabRole
+
 **Issue**: AWS Learner Lab restricts IAM policy attachment via CLI (AccessDenied error).
 
 **Solution**: Attach policy manually via AWS Console:
 
 1. **Policy File Created**: `s3-policy.json` (in project root)
 2. **Policy Content**:
+
 ```json
 {
   "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject"
-    ],
-    "Resource": "arn:aws:s3:::fragments/*"
-  }]
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::fragments/*"
+    }
+  ]
 }
 ```
 
@@ -146,15 +153,18 @@ npm run test:integration
 ### 📋 FILES MODIFIED/CREATED
 
 **CI/CD Configuration**:
+
 - `.github/workflows/ci.yml` - Added hadolint and docker-hub jobs
 - `.github/workflows/cd.yml` - ECR push with task definition rendering
 - `jest.config.js` - Lowered branch coverage threshold to 55%
 
 **AWS/ECS**:
+
 - `fragments-definition.json` - ECS task definition with LabRole ARNs
 - `s3-policy.json` - S3 access policy for LabRole (created, ready to attach)
 
 **Application Code**:
+
 - `src/model/data/aws/*` - S3 adapter implementation
 - `src/model/data/index.js` - AWS/S3 adapter selection logic
 - `tests/integration/lab-9-s3.hurl` - S3 integration tests
@@ -162,6 +172,7 @@ npm run test:integration
 ---
 
 ## 🎉 SUMMARY
+
 - ✅ All CI/CD workflows operational and tested
 - ✅ Docker images successfully pushed to Docker Hub and ECR
 - ✅ Unit tests and integration tests passing
@@ -169,7 +180,8 @@ npm run test:integration
 - ⚠️ S3 IAM policy needs manual attachment via AWS Console (Learner Lab restriction)
 - 📸 Ready to capture required screenshots
 
-**Next Steps**: 
+**Next Steps**:
+
 1. Attach S3 policy to LabRole via AWS Console
 2. Take screenshots for submission
 3. (Optional) Deploy and test ECS service with the new image

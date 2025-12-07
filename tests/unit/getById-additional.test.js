@@ -96,7 +96,7 @@ describe('GET /v1/fragments/:id - additional branch coverage', () => {
     expect(getRes.text).toBe(csvData);
   });
 
-  test('cannot access another user\'s fragment', async () => {
+  test("cannot access another user's fragment", async () => {
     // User 1 creates a fragment
     const postRes = await request(app)
       .post('/v1/fragments')
@@ -119,9 +119,9 @@ describe('GET /v1/fragments/:id - additional branch coverage', () => {
     const complexJson = {
       users: [
         { id: 1, name: 'Alice', roles: ['admin', 'user'] },
-        { id: 2, name: 'Bob', roles: ['user'] }
+        { id: 2, name: 'Bob', roles: ['user'] },
       ],
-      meta: { version: '1.0', count: 2 }
+      meta: { version: '1.0', count: 2 },
     };
 
     const postRes = await request(app)

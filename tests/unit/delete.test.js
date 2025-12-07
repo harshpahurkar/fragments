@@ -49,7 +49,7 @@ describe('DELETE /v1/fragments/:id', () => {
     expect(deleteRes.body.error.message).toBe('not found');
   });
 
-  test('cannot delete another user\'s fragment', async () => {
+  test("cannot delete another user's fragment", async () => {
     // User 1 creates a fragment
     const postRes = await request(app)
       .post('/v1/fragments')

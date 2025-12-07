@@ -95,10 +95,10 @@ describe('POST /v1/fragments - additional branch coverage', () => {
       level1: {
         level2: {
           level3: {
-            value: 'deep'
-          }
-        }
-      }
+            value: 'deep',
+          },
+        },
+      },
     };
     const res = await request(app)
       .post('/v1/fragments')
