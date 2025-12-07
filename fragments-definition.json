@@ -21,7 +21,8 @@
       "environment": [
         { "name": "LOG_LEVEL", "value": "info" },
         { "name": "NODE_ENV", "value": "production" },
-        { "name": "AWS_S3_BUCKET_NAME", "value": "fragments" }
+        { "name": "AWS_S3_BUCKET_NAME", "value": "fragments" },
+        { "name": "AWS_DYNAMODB_TABLE_NAME", "value": "fragments" }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
