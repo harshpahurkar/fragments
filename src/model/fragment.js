@@ -60,10 +60,10 @@ Fragment.getValidConversions = function (contentType) {
     return ['.txt'];
   }
   if (contentType === 'text/markdown') {
-    return ['.md', '.html', '.txt'];
+    return ['.md', '.html', '.htm', '.txt'];
   }
   if (contentType === 'text/html') {
-    return ['.html', '.txt'];
+    return ['.html', '.htm', '.txt'];
   }
   if (contentType === 'text/csv') {
     return ['.csv', '.txt'];
