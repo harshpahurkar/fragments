@@ -18,6 +18,7 @@ function writeFragment(ownerId, fragment) {
       size: fragment.size,
       created: fragment.created,
       updated: fragment.updated,
+      tags: fragment.tags || [],
     },
   };
 

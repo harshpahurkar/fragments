@@ -56,7 +56,27 @@ module.exports = async (req, res) => {
         content = req.body;
       }
     }
-    const fragment = await createFragment(owner, { content, contentType: mime });
+
+    // Parse tags from X-Tags header (comma-separated) or tags query param
+    let tags = [];
+    const tagsHeader = req.headers['x-tags'];
+    const tagsQuery = req.query.tags;
+
+    if (tagsHeader) {
+      tags = tagsHeader
+        .split(',')
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+    } else if (tagsQuery) {
+      tags = Array.isArray(tagsQuery)
+        ? tagsQuery
+        : tagsQuery
+            .split(',')
+            .map((t) => t.trim())
+            .filter((t) => t.length > 0);
+    }
+
+    const fragment = await createFragment(owner, { content, contentType: mime, tags });
 
     logger.info({ owner, id: fragment.id, fragment }, 'fragment created - full object');
 
@@ -77,6 +97,7 @@ module.exports = async (req, res) => {
       updated: fragment.updated,
       type: fragment.contentType,
       size: fragment.size,
+      tags: fragment.tags || [],
     };
 
     logger.info({ response }, 'sending response');

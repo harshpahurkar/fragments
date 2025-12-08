@@ -14,6 +14,7 @@ describe('post handler unit tests (non-buffer body)', () => {
       body: { a: 1 },
       ownerId: 'owner-hash',
       protocol: 'http',
+      query: {},
     };
 
     const json = jest.fn();
@@ -25,6 +26,7 @@ describe('post handler unit tests (non-buffer body)', () => {
     expect(mockCreate).toHaveBeenCalledWith('owner-hash', {
       content: JSON.stringify({ a: 1 }),
       contentType: 'application/json',
+      tags: [],
     });
     expect(status).toHaveBeenCalledWith(201);
     expect(json).toHaveBeenCalled();

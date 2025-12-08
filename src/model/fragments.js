@@ -3,8 +3,8 @@
 const data = require('./data');
 const Fragment = require('./fragment');
 
-async function createFragment(owner, { content, contentType = 'text/plain' }) {
-  const frag = new Fragment({ owner, contentType, size: Buffer.byteLength(content || '') });
+async function createFragment(owner, { content, contentType = 'text/plain', tags = [] }) {
+  const frag = new Fragment({ owner, contentType, size: Buffer.byteLength(content || ''), tags });
   await data.writeFragment(owner, frag);
   await data.writeFragmentData(owner, frag.id, content);
   return Object.assign({}, frag, { content });
@@ -46,7 +46,7 @@ async function deleteFragment(owner, id) {
   return true;
 }
 
-async function updateFragment(owner, id, content) {
+async function updateFragment(owner, id, content, tags) {
   // Get existing fragment metadata
   const existingMeta = await data.readFragment(owner, id);
   if (!existingMeta) {
@@ -61,6 +61,7 @@ async function updateFragment(owner, id, content) {
     size: Buffer.byteLength(content || ''),
     created: existingMeta.created,
     updated: new Date().toISOString(),
+    tags: tags !== undefined ? tags : existingMeta.tags || [],
   });
 
   // Write updated data and metadata

@@ -42,9 +42,9 @@ services:
     ports:
       # Default port is 8000
       - '8000:8000'
-    # Run the database in memory, see:
+    # Run the database in memory with shared DB enabled, see:
     # https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.UsageNotes.html
-    command: ['-jar', 'DynamoDBLocal.jar', '-inMemory']
+    command: ['-jar', 'DynamoDBLocal.jar', '-inMemory', '-sharedDb']
 
   # LocalStack for S3, see https://docs.localstack.cloud/overview/
   # Interact via awscli-local, see https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal

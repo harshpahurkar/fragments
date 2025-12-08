@@ -46,8 +46,31 @@ module.exports = async (req, res) => {
       content = JSON.stringify(req.body);
     }
 
+    // Parse tags from X-Tags header (comma-separated) or tags query param
+    let tags = existingFragment.tags || [];
+    const tagsHeader = req.headers['x-tags'];
+    const tagsQuery = req.query.tags;
+
+    if (tagsHeader !== undefined) {
+      // X-Tags header is present (even if empty) - update tags
+      tags =
+        tagsHeader === ''
+          ? []
+          : tagsHeader
+              .split(',')
+              .map((t) => t.trim())
+              .filter((t) => t.length > 0);
+    } else if (tagsQuery !== undefined) {
+      tags = Array.isArray(tagsQuery)
+        ? tagsQuery
+        : tagsQuery
+            .split(',')
+            .map((t) => t.trim())
+            .filter((t) => t.length > 0);
+    }
+
     // Update the fragment
-    const updatedFragment = await updateFragment(owner, id, content);
+    const updatedFragment = await updateFragment(owner, id, content, tags);
 
     logger.info({ owner, id }, 'Fragment updated successfully');
 
@@ -59,6 +82,7 @@ module.exports = async (req, res) => {
       updated: updatedFragment.updated,
       type: updatedFragment.contentType,
       size: updatedFragment.size,
+      tags: updatedFragment.tags || [],
     };
 
     res.status(200).json(createSuccessResponse({ fragment: response }));

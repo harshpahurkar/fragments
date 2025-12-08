@@ -20,7 +20,9 @@ async function writeFragment(owner, fragment) {
     owner, // owner is the ownerId (hashed email)
     contentType: fragment.contentType || 'text/plain',
     created,
+    updated: fragment.updated || created,
     size: fragment.size || 0,
+    tags: fragment.tags || [],
   };
   metaStore.get(owner).set(id, meta);
   logger.debug({ owner, id }, 'memory-db: wrote fragment meta');

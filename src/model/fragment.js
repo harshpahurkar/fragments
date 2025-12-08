@@ -9,6 +9,7 @@ class Fragment {
     size = 0,
     created = new Date().toISOString(),
     updated = new Date().toISOString(),
+    tags = [],
   }) {
     this.id = id;
     this.owner = owner;
@@ -16,6 +17,7 @@ class Fragment {
     this.size = size;
     this.created = created;
     this.updated = updated;
+    this.tags = Array.isArray(tags) ? tags : [];
   }
 }
 
