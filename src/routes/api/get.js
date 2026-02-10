@@ -19,13 +19,18 @@ module.exports = async (req, res) => {
     
     let fragments = await listFragments(owner, expand);
 
+    // Defensive: remove any missing metadata entries
+    if (Array.isArray(fragments)) {
+      fragments = fragments.filter(Boolean);
+    }
+
     // Filter by tag if provided
     if (tagFilter && expand) {
       // Only filter when expand=1 (we have full metadata with tags)
       const tagsToMatch = Array.isArray(tagFilter) ? tagFilter : [tagFilter];
       fragments = fragments.filter((f) => {
         // Check if fragment has tags and if any match the filter
-        return f.tags && Array.isArray(f.tags) && f.tags.some((tag) => tagsToMatch.includes(tag));
+        return Array.isArray(f?.tags) && f.tags.some((tag) => tagsToMatch.includes(tag));
       });
     }
 
